@@ -1,0 +1,24 @@
+System = X
+PREC = A
+
+ISTART = 0
+ISMEAR = 0
+SIGMA = 0.1
+
+ICHARG = 2 
+EDIFF = 1E-4
+
+NSW = 0
+
+ISYM = -1
+
+# static potential
+LVTOT = .TRUE.
+LVHAR= .TURE.
+
+# use KPOINTS_OPT and analysis PROCAR to get band structure
+LORBIT = 11
+
+# save volume and bandwidth
+LWAVE = F
+LCHARG = F
