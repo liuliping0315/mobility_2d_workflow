@@ -61,7 +61,7 @@ for linux user, add your work user to docker group.
 gpasswd -a liulp docker
 ```
 
-for windows user, please run all kube related command in a administritive powershell/cmd
+for windows user, please run all kube related command in a administrative powershell/cmd
 ```bash
 # run `netsh winsock reset`, and do not reboot, in case of network problem
 conda activate dflow # mamba activate is bad in powershell
