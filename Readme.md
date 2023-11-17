@@ -3,14 +3,14 @@ workflow to calculate mobility of 2D or 1D materials
 # 2. Prerequisites
 ## 2.1 Local machine
 
-a python3 env with numpy, pandas, pydflow, pymatgen installed
+a python3 env with numpy, pandas, pydflow installed
 
 docker and k8s: https://github.com/deepmodeling/dflow/blob/master/tutorials/readme.md
 
 ## 2.2 Remote cluster
 slurm system
 
-similar python env with numpy, pandas, pydflow, pymatgen
+similar python env with numpy, pandas, pydflow
 
 vasp with compitable mpirun, vaspkit
 

@@ -8,11 +8,6 @@ import time
 
 import numpy as np
 import pandas as pd
-import pymatgen
-from pymatgen.core import Structure
-from pymatgen.io.vasp.inputs import Kpoints
-from pymatgen.symmetry.bandstructure import HighSymmKpath
-import pymatgen.io.vasp.outputs as vaspout
 
 from dflow import (
     RemoteExecutor,

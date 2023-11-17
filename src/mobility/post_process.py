@@ -9,15 +9,6 @@ from typing import List, Tuple
 import numpy as np
 import numpy.linalg as LA
 
-import ase
-import ase.io
-import ase.units
-import pymatgen
-from pymatgen.core import Structure
-from pymatgen.io.vasp.inputs import Kpoints
-import pymatgen.io.vasp.outputs as vaspout
-
-
 strain_list = [0.990, 0.995, 1.000, 1.005, 1.010]
 strain_str = ["{:1d}_{:.3f}".format(i, j) for j in strain_list for i in [0, 1]]
 ratios = [0.990, 0.995, 1.000, 1.005, 1.010]
@@ -80,16 +71,35 @@ def gen_kpoints():
     kpt_scf.write("{:d} {:d} {:d}\n".format(nk1, nk2, nk3))
     kpt_scf.write("0 0 0\n")
     kpt_scf.close()
-    # structure = Structure.from_file("POSCAR")
-    # kpoints_scf = Kpoints.automatic_density_by_lengths(
-    #     structure, length_densities=[30, 30, 1], force_gamma=True)
-    # kpoints_scf.write_file("KPOINTS")
 
-    # ibz = HighSymmKpath(structure)
-    # kpoints_bs = Kpoints.automatic_linemode(20, ibz)
-    # kpoints_bs.write_file("KPOINTS_OPT")
-
-
+def get_lvhar():
+    locpot = open("LOCPOT", 'r')
+    txt = locpot.readlines()
+    locpot.close()
+    outcar = open("OUTCAR", 'r')
+    nx = 0
+    ny = 0
+    nz = 0
+    for line in outcar:
+        if "support grid" in line:
+            tmp = line.split()
+            nx = int(tmp[3])
+            ny = int(tmp[5])
+            nz = int(tmp[7])
+    outcar.close()
+    if nx==0 or ny==0 or nz==0:
+        print("nx=0?")
+        sys.exit(-1)
+    ntot = nx * ny * nz
+    n_data_lines = int(np.ceil(ntot/5))
+    data = txt[-n_data_lines:]
+    pot = []
+    for line in data:
+        pot += [float (tmp) for  tmp in line.split()]
+    pot_array = np.array(pot).reshape(nz, ny, nx)
+    pot_z = np.sum(pot_array,axis=[1,2])
+    return pot_z
+    
 def calc_mobility():
     # this function is a comment
     # now we have c2d, dfc, m*, m*_d in atomic units as 4-element arrays
@@ -145,6 +155,7 @@ class VaspOut:
         self.get_e_tot()
         self.get_e_fermi()
         self.get_vacumm_level_z()
+        self.workdir = os.getcwd()
 
     def get_cell(self):
         self.cell = np.loadtxt(fname="POSCAR", dtype=float,
@@ -170,10 +181,14 @@ class VaspOut:
                 self.e_fermi = float(line.split()[2])
 
     def get_vacumm_level_z(self):
-        sep = vaspout.Locpot.from_file("LOCPOT")
-        vz = sep.get_average_along_axis(2)
-        self.e_vaccum = np.max(vz)
-
+        # sep = vaspout.Locpot.from_file("LOCPOT")
+        # vz = sep.get_average_along_axis(2)
+        # self.e_vaccum = np.max(vz)
+        current_dir = os.getcwd()
+        os.chdir(self.workdir)
+        pot_z = get_lvhar()
+        os.chdir(current_dir)
+        return pot_z
     def get_band_structure_Kopt(self):
         procar_opt = open("PROCAR_OPT", 'r')
         txt = procar_opt.readlines()
